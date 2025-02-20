@@ -4,18 +4,8 @@ namespace MedianetDev\CloudMessage\Drivers;
 
 trait Notification
 {
-
     protected static function firebaseRequest(string $url, array $payload, array $headers = [], $method = 'POST')
     {
-        if (isset($payload['message']['notification']['data']) && ! empty($payload['message']['notification']['data'])) {
-            foreach ($payload['message']['notification']['data'] as $key => $v) {
-                $payload['message']['notification']['data'][$key] = (string) $v;
-            }
-
-            $payload['message']['data'] = $payload['message']['notification']['data'];
-            unset($payload['message']['notification']['data']);
-        }
-
         return self::request($url, json_encode($payload), $headers, $method);
     }
 

@@ -28,14 +28,22 @@ class FirebaseNotification implements NotificationInterface
 
         $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
 
+        if (isset($message['data'])) {
+            $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
+        }
+
         $data = [
             'message' => [
                 'topic' => $topic,
-                'notification' => $message,
+                'data' => $message,
+                'notification' => [
+                    'title' => $message['title'],
+                    'body' => $message['body'],
+                ],
             ],
         ];
 
-        $response = self::firebaseRequest($url, $data, $headers);
+        $response = self::request($url, json_encode($data), $headers);
 
         return ['status' => $response['status']];
     }
@@ -44,6 +52,10 @@ class FirebaseNotification implements NotificationInterface
     {
         $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
         try {
+            if (isset($message['data'])) {
+                $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
+            }
+
             $headers = [
                 'Authorization: Bearer '.self::getAccessToken(),
                 'Content-Type: application/json',
@@ -52,10 +64,14 @@ class FirebaseNotification implements NotificationInterface
                 dispatch(new MultiTokensJob($tokens, $message, $url, $headers));
             } else {
                 foreach ($tokens as $mobileId) {
-                    self::firebaseRequest($url, ['message' => [
+                    self::request($url, json_encode(['message' => [
                         'token' => $mobileId,
-                        'notification' => $message,
-                    ]], $headers);
+                        'data' => $message,
+                        'notification' => [
+                            'title' => $message['title'],
+                            'body' => $message['body'],
+                        ],
+                    ]]), $headers);
                 }
             }
 
