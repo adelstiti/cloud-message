@@ -4,6 +4,11 @@ namespace MedianetDev\CloudMessage\Drivers;
 
 trait Notification
 {
+    protected static function firebaseRequest(string $url, array $payload, array $headers = [], $method = 'POST')
+    {
+        return self::request($url, json_encode($payload), $headers, $method);
+    }
+
     protected static function request(string $url, string $payload, array $headers = [], $method = 'POST')
     {
         $ch = curl_init();

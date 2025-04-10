@@ -28,10 +28,18 @@ class FirebaseNotification implements NotificationInterface
 
         $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
 
+        if (isset($message['data'])) {
+            $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
+        }
+
         $data = [
             'message' => [
                 'topic' => $topic,
-                'notification' => $message,
+                'data' => $message,
+                'notification' => [
+                    'title' => $message['title'],
+                    'body' => $message['body'],
+                ],
             ],
         ];
 
@@ -44,6 +52,10 @@ class FirebaseNotification implements NotificationInterface
     {
         $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
         try {
+            if (isset($message['data'])) {
+                $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
+            }
+
             $headers = [
                 'Authorization: Bearer '.self::getAccessToken(),
                 'Content-Type: application/json',
@@ -54,7 +66,11 @@ class FirebaseNotification implements NotificationInterface
                 foreach ($tokens as $mobileId) {
                     self::request($url, json_encode(['message' => [
                         'token' => $mobileId,
-                        'notification' => $message,
+                        'data' => $message,
+                        'notification' => [
+                            'title' => $message['title'],
+                            'body' => $message['body'],
+                        ],
                     ]]), $headers);
                 }
             }

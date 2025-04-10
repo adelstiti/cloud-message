@@ -35,7 +35,11 @@ class MultiTokensJob implements ShouldQueue
         foreach ($this->tokens as $mobileId) {
             self::request($this->url, json_encode(['message' => [
                 'token' => $mobileId,
-                'notification' => $this->message,
+                'data' => $this->message,
+                'notification' => [
+                    'title' => $this->message['title'],
+                    'body' => $this->message['body'],
+                ],
             ]]), $this->headers);
         }
     }
