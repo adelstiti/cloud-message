@@ -62,19 +62,23 @@ $registrationTokens = [
     'token2'
 ];
 
-// Send via Firebase (default)
-$results = CloudMessage::sendToTokens($message, $registrationTokens);
+// Send to Android devices
+$results = CloudMessage::sendToTokens($message, $registrationTokens, 'android');
 
-// Send via Huawei
+// Send to iOS devices
+$results = CloudMessage::sendToTokens($message, $registrationTokens, 'ios');
+
+// Send to Huawei devices
 $results = CloudMessage::sendToTokens($message, $registrationTokens, 'huawei');
 ```
 
-### Using the FirebaseNotification Class Directly
+### Send to specific devices without using the Facade
 
-You can also use the `FirebaseNotification` class directly:
+You can also use the notification class directly:
 
 ```php
 use MedianetDev\CloudMessage\Drivers\FirebaseNotification;
+use MedianetDev\CloudMessage\Drivers\HuaweiNotification;
 
 $message = [
     'title' => "Your notification title",
@@ -87,29 +91,61 @@ $registrationTokens = [
 ];
 
 $results = FirebaseNotification::sendToTokens($message, $registrationTokens);
+$results = HuaweiNotification::sendToTokens($message, $registrationTokens);
 ```
 
 ### Subscribe to a Topic
 ```php
-$topic = 'guests'
+use MedianetDev\CloudMessage\Facade\CloudMessage;
+
+$topic = 'guests';
 $registrationTokens = [
     'token1',
     'token2'
 ];
 
-$results = FirebaseNotification::subscribeToTopic($topic, $registrationTokens);
+$results = CloudMessage::subscribeToTopic($topic, $registrationTokens, 'ios');
 ```
 This will subscribe the provided tokens to receive notifications for the given topic.
 
+### Send to a Topic
+```php
+use MedianetDev\CloudMessage\Facade\CloudMessage;
+
+$message = [
+    'title' => "Your notification title",
+    'body' => "Your notification body",
+];
+
+$topic = 'guests';
+
+// Send to Android devices
+$results = CloudMessage::sendToTopic($message, $topic, 'android');
+
+// Send to iOS devices
+$results = CloudMessage::sendToTopic($message, $topic, 'ios');
+
+// Send to Huawei devices
+$results = CloudMessage::sendToTopic($message, $topic, 'huawei');
+```
+This will send the notification to all devices subscribed to the given topic.
+
+
 ### Unsubscribe to a Topic
 ```php
-$topic = 'guests'
+use MedianetDev\CloudMessage\Facade\CloudMessage;
+
+$topic = 'guests';
 $registrationTokens = [
     'token1',
     'token2'
 ];
 
-$results = FirebaseNotification::unsubscribeToTopic($topic, $registrationTokens);
+// Unsubscribe Android devices
+$results = CloudMessage::unsubscribeToTopic($topic, $registrationTokens, 'android');
+
+// Unsubscribe iOS devices
+$results = CloudMessage::unsubscribeToTopic($topic, $registrationTokens, 'ios');
 ```
 Removes the subscription of the tokens from the given topic.
 

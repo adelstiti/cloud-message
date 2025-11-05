@@ -14,19 +14,19 @@ class FirebaseNotification implements NotificationInterface
     private static $firebaseMessagingScope = 'https://www.googleapis.com/auth/firebase.messaging';
     private static $googleApiBaseUrl = 'https://iid.googleapis.com/iid/v1/';
 
-    public static function sendToAll(array $message)
+    public static function sendToAll(array $message, string $os)
     {
         // TODO: Send to all devices
     }
 
-    public static function sendToTopic(array $message, $topic)
+    public static function sendToTopic(array $message, string $topic, string $os)
     {
         $headers = [
-            'Authorization: Bearer ' . self::getAccessToken(),
+            'Authorization: Bearer '.self::getAccessToken(),
             'Content-Type: application/json',
         ];
 
-        $url = self::$firebaseApiBaseUrl . config('cloud_message.firebase.project_id') . '/messages:send';
+        $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
 
         if (isset($message['data'])) {
             $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
@@ -36,28 +36,31 @@ class FirebaseNotification implements NotificationInterface
             'message' => [
                 'topic' => $topic,
                 'data' => $message,
-                'notification' => [
-                    'title' => $message['title'],
-                    'body' => $message['body'],
-                ],
             ],
         ];
+
+        if (0 === strcasecmp($os, config('cloud_message.os_types.ios'))) {
+            $data['message']['notification'] = [
+                'title' => $message['title'],
+                'body' => $message['body'],
+            ];
+        }
 
         $response = self::request($url, json_encode($data), $headers);
 
         return ['status' => $response['status']];
     }
 
-    public static function sendToTokens(array $message, array $tokens)
+    public static function sendToTokens(array $message, array $tokens, string $os)
     {
-        $url = self::$firebaseApiBaseUrl . config('cloud_message.firebase.project_id') . '/messages:send';
+        $url = self::$firebaseApiBaseUrl.config('cloud_message.firebase.project_id').'/messages:send';
         try {
             if (isset($message['data'])) {
                 $message['data'] = json_encode($message['data'], JSON_UNESCAPED_UNICODE);
             }
 
             $headers = [
-                'Authorization: Bearer ' . self::getAccessToken(),
+                'Authorization: Bearer '.self::getAccessToken(),
                 'Content-Type: application/json',
             ];
             if (config('cloud_message.async_requests')) {
@@ -87,10 +90,10 @@ class FirebaseNotification implements NotificationInterface
 
     public static function subscribeToTopic(string $topic, array $tokens)
     {
-        $url = self::$googleApiBaseUrl . ':batchAdd';
+        $url = self::$googleApiBaseUrl.':batchAdd';
 
         $headers = [
-            'Authorization: Bearer ' . self::getAccessToken(),
+            'Authorization: Bearer '.self::getAccessToken(),
             'Content-Type: application/json',
             'access_token_auth: true',
         ];
@@ -100,7 +103,7 @@ class FirebaseNotification implements NotificationInterface
 
         foreach ($chunkedTokens as $tokenGroup) {
             $data = [
-                'to' => '/topics/' . $topic,
+                'to' => '/topics/'.$topic,
                 'registration_tokens' => $tokenGroup,
             ];
 
@@ -118,10 +121,10 @@ class FirebaseNotification implements NotificationInterface
 
     public static function unsubscribeToTopic(string $topic, array $tokens)
     {
-        $url = self::$googleApiBaseUrl . ':batchRemove';
+        $url = self::$googleApiBaseUrl.':batchRemove';
 
         $headers = [
-            'Authorization: Bearer ' . self::getAccessToken(),
+            'Authorization: Bearer '.self::getAccessToken(),
             'Content-Type: application/json',
             'access_token_auth: true',
         ];
@@ -131,7 +134,7 @@ class FirebaseNotification implements NotificationInterface
 
         foreach ($chunkedTokens as $tokenGroup) {
             $data = [
-                'to' => '/topics/' . $topic,
+                'to' => '/topics/'.$topic,
                 'registration_tokens' => $tokenGroup,
             ];
 
