@@ -11,12 +11,12 @@ class HuaweiNotification implements NotificationInterface
     private static $urlAuth = 'https://login.vmall.com/oauth2/token';
     private static $pushUrl = 'https://push-api.cloud.huawei.com/v1/';
 
-    public static function sendToAll(array $message)
+    public static function sendToAll(array $message, string $os)
     {
         // TODO: Send to all devices
     }
 
-    public static function sendToTokens(array $message, array $tokens)
+    public static function sendToTokens(array $message, array $tokens, string $os)
     {
         $structureData = [];
         $structureData['validate_only'] = false;
@@ -47,7 +47,7 @@ class HuaweiNotification implements NotificationInterface
         return $result['access_token'] ?? '';
     }
 
-    public static function sendToTopic(array $message, string $topic)
+    public static function sendToTopic(array $message, string $topic, string $os)
     {
     }
 
