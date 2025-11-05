@@ -4,35 +4,47 @@ namespace MedianetDev\CloudMessage\Facade;
 
 class CloudMessage
 {
-    public static function sendToAll(array $message, string $driver = 'firebase')
+    public static function sendToAll(array $message, string $os)
     {
+        // Get driver by OS
+        $driver = self::getDriverByOs($os);
+
         // Detect driver class
         $class = self::getDriverClass($driver);
 
         // Call driver method
-        return $class::sendToAll($message);
+        return $class::sendToAll($message, $os);
     }
 
-    public static function sendToTokens(array $message, array $tokens, string $driver = 'firebase')
+    public static function sendToTokens(array $message, array $tokens, string $os)
     {
+        // Get driver by OS
+        $driver = self::getDriverByOs($os);
+
         // Detect driver class
         $class = self::getDriverClass($driver);
 
         // Call driver method
-        return $class::sendToTokens($message, $tokens);
+        return $class::sendToTokens($message, $tokens, $os);
     }
 
-    public static function sendToTopic(array $message, string $topic, string $driver = 'firebase')
+    public static function sendToTopic(array $message, string $topic, string $os)
     {
+        // Get driver by OS
+        $driver = self::getDriverByOs($os);
+
         // Detect driver class
         $class = self::getDriverClass($driver);
 
         // Call driver method
-        return $class::sendToTopic($message, $topic);
+        return $class::sendToTopic($message, $topic, $os);
     }
 
-    public static function subscribeToTopic(string $topic, array $tokens, string $driver = 'firebase')
+    public static function subscribeToTopic(string $topic, array $tokens, string $os)
     {
+        // Get driver by OS
+        $driver = self::getDriverByOs($os);
+
         // Detect driver class
         $class = self::getDriverClass($driver);
 
@@ -40,8 +52,11 @@ class CloudMessage
         return $class::subscribeToTopic($topic, $tokens);
     }
 
-    public static function unsubscribeToTopic(string $topic, array $tokens, string $driver = 'firebase')
+    public static function unsubscribeToTopic(string $topic, array $tokens, string $os)
     {
+        // Get driver by OS
+        $driver = self::getDriverByOs($os);
+
         // Detect driver class
         $class = self::getDriverClass($driver);
 
@@ -61,5 +76,22 @@ class CloudMessage
         }
 
         return $drivers[$driver];
+    }
+
+    protected static function getDriverByOs(string $os)
+    {
+        $os = strtolower($os);
+        $osTypes = config('cloud_message.os_types');
+
+        switch ($os) {
+            case strtolower($osTypes['android']):
+            case strtolower($osTypes['ios']):
+                return 'firebase';
+            case strtolower($osTypes['huawei']):
+                return 'huawei';
+            default:
+                throw new \InvalidArgumentException('OS type not supported');
+                throw new \Exception("OS type '{$os}' is not supported. Allowed values are: {$allowed}");
+        }
     }
 }

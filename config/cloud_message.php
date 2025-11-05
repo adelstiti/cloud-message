@@ -4,9 +4,6 @@ return [
     /* This file is part of the medianet-dev/cloud-message package. */
     /* This is the configuration file for the CloudMessage package. */
 
-    // Default driver to use
-    'default_driver' => 'firebase',
-
     // Firebase settings
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
@@ -25,5 +22,12 @@ return [
 
     // Enable or disable async requests
     'async_requests' => env('CLOUD_MESSAGE_ASYNC_REQUESTS', false),
+
+    // Operating system types
+    'os_types' => [
+        'android' => 'android',
+        'ios' => 'ios',
+        'huawei' => 'huawei',
+    ],
 
 ];
